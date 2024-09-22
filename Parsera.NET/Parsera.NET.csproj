@@ -3,6 +3,31 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Parsera</RootNamespace>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Parsera.NET</Title>
+    <Version>0.0.1</Version>
+    <Authors>Amadej Glasenčnik</Authors>
+    <Description>A lightweight NuGet package for the Parsera API, designed to simplify interactions and streamline data scraping tasks. This wrapper offers an easy-to-use interface, enabling developers to harness the power of Parsera's capabilities effortlessly.</Description>
+    <Copyright>Copyright (c) Amadej Glasenčnik 2024.</Copyright>
+    <PackageProjectUrl>https://github.com/aglasencnik/Parsera.NET</PackageProjectUrl>
+    <PackageIcon>Icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/aglasencnik/Parsera.NET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>csharp; dotnet; nuget; scraping; data-extraction; llm</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\Icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
