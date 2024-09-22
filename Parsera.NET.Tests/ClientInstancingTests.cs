@@ -6,7 +6,7 @@ namespace Parsera.Tests;
 
 public class ClientInstancingTests
 {
-    private string _apiKey;
+    private readonly string _apiKey;
 
     public ClientInstancingTests()
     {
