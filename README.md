@@ -32,7 +32,100 @@ After installation, make sure that Parsera.NET is listed in your project depende
 
 ## Usage
 
-TODO
+To get started with ParseraClient, create an instance of the `ParseraClient` class and use its methods to interact with the Parsera API.
+Below is an example of how you can retireve the list of available proxy countries:
+
+```csharp
+var parseraClient = new ParseraClient("api-key");
+
+var proxyCountries = await parseraClient.GetProxyCountriesAsync();
+
+Console.WriteLine("Proxy countries:");
+foreach (var country in proxyCountries.Take(10))
+{
+    Console.WriteLine($"{country.FriendlyName} ({country.SystemName})");
+}
+```
+
+You can also extract data from a specific website, such as Hacker News:
+
+```csharp
+var parseraClient = new ParseraClient("api-key");
+
+var result = await parseraClient.ExtractAsync<ExtractionModel>("https://news.ycombinator.com/", "UnitedStates");
+
+Console.WriteLine("\nExtraction result:");
+var counter = 1;
+foreach (var extraction in result)
+{
+    Console.WriteLine($"Extraction {counter++}");
+    Console.WriteLine($"Title: {extraction.Title}");
+    Console.WriteLine($"Points: {extraction.Points}");
+    Console.WriteLine();
+}
+
+class ExtractionModel
+{
+    [Extraction("Title", "News title")]
+    public string Title { get; set; }
+
+    [Extraction("Points", "Number of points")]
+    public int Points { get; set; }
+}
+```
+
+### Dependency Injection and Instancing
+
+There are different ways to create an instance of `ParseraClient` in your project, either by instantiating it directly or using dependency injection (DI) in ASP.NET Core or other DI frameworks.
+
+#### Instantiating Directly
+
+You can create an instance of `ParseraClient` with an API key or options:
+
+```csharp
+// With API key
+var parseraClient = new ParseraClient("your-api-key");
+
+// With custom options
+var options = new ParseraClientOptions
+{
+    ApiKey = "your-api-key"
+};
+var parseraClient = new ParseraClient(options);
+```
+
+#### Using Dependency Injection (DI)
+
+You can configure `ParseraClient` to be injected via the service container in DI-heavy environments like ASP.NET Core:
+
+1. **With API Key**
+
+```csharp
+var builder = Host.CreateApplicationBuilder();
+
+// Add ParseraClient to the service collection with API key
+builder.Services.AddParseraClient("your-api-key");
+
+var serviceProvider = builder.Build().Services;
+var parseraClient = serviceProvider.GetRequiredService<IParseraClient>();
+```
+
+2. **With Custom Options**
+
+```csharp
+var builder = Host.CreateApplicationBuilder();
+
+// Add ParseraClient to the service collection with custom options
+builder.Services.AddParseraClient(new ParseraClientOptions
+{
+    ApiKey = _apiKey
+});
+
+var serviceProvider = builder.Build().Services;
+var parseraClient = serviceProvider.GetRequiredService<IParseraClient>();
+```
+
+In both cases, you can retrieve an `IParseraClient` instance from the service provider and use it in your project.
 
 ## Support the Project
 
