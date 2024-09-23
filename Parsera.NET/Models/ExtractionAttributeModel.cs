@@ -5,7 +5,7 @@ namespace Parsera.Models
     /// <summary>
     /// Represents an extraction attribute.
     /// </summary>
-    public class ExtractionAttribute
+    internal class ExtractionAttributeModel
     {
         /// <summary>
         /// Gets or sets the name of the attribute.

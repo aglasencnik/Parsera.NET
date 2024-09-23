@@ -80,23 +80,77 @@ namespace Parsera
             }
         }
 
+        private IEnumerable<ExtractionAttributeModel> GetExtractionAttributes<TExtractionModel>()
+        {
+            var attributes = new List<ExtractionAttributeModel>();
+
+            foreach (var property in typeof(TExtractionModel).GetProperties())
+            {
+                var extractionAttribute = property.GetCustomAttributes(typeof(ExtractionAttribute), false).FirstOrDefault() as ExtractionAttribute;
+                if (extractionAttribute == null)
+                    continue;
+
+                attributes.Add(new ExtractionAttributeModel
+                {
+                    Name = extractionAttribute.Name,
+                    Description = extractionAttribute.Description,
+                });
+            }
+
+            return attributes;
+        }
+
+        private IEnumerable<TExtractionModel> GetExtractionResults<TExtractionModel>(IEnumerable<IDictionary<string, string>> extractionResults)
+        {
+            if (extractionResults == null)
+                return null;
+
+            var extractionModels = new List<TExtractionModel>();
+
+            foreach (var extractionResult in extractionResults)
+            {
+                var extractionModel = Activator.CreateInstance<TExtractionModel>();
+
+                foreach (var property in typeof(TExtractionModel).GetProperties())
+                {
+                    var extractionAttribute = property.GetCustomAttributes(typeof(ExtractionAttribute), false).FirstOrDefault() as ExtractionAttribute;
+                    if (extractionAttribute == null)
+                        continue;
+
+                    var value = extractionResult.FirstOrDefault(x => x.Key == extractionAttribute.Name).Value;
+                    if (value == null)
+                        continue;
+
+                    property.SetValue(extractionModel, Convert.ChangeType(value, property.PropertyType));
+                }
+
+                extractionModels.Add(extractionModel);
+            }
+
+            return extractionModels;
+        }
+
         #endregion
 
         #region Methods
 
         /// <inheritdoc />
-        public async Task<ExtractionResult> ExtractAsync(ExtractionRequest extractionRequest, CancellationToken cancellation = default)
+        public async Task<IEnumerable<TExtractionModel>> ExtractAsync<TExtractionModel>(string url, string proxyCountry, CancellationToken cancellation = default)
         {
+            if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(proxyCountry))
+                return null;
+
+            var extractionRequest = new ExtractionRequest
+            {
+                Url = url,
+                Attributes = GetExtractionAttributes<TExtractionModel>(),
+                ProxyCountry = proxyCountry,
+            };
+
             var result = await GetResultAsync<IEnumerable<IDictionary<string, string>>, ExtractionRequest>(
                 "/v1/extract", HttpMethod.Post, extractionRequest, cancellation);
 
-            if (result == null)
-                return null;
-
-            return new ExtractionResult
-            {
-                Data = result ?? Enumerable.Empty<IDictionary<string, string>>(),
-            };
+            return GetExtractionResults<TExtractionModel>(result);
         }
 
         /// <inheritdoc />

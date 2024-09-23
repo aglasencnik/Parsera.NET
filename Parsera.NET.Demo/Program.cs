@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Parsera;
-using Parsera.Models;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -18,35 +17,23 @@ foreach (var country in proxyCountries.Take(10))
 }
 
 // Extract data from Hacker News
-var extractionRequest = new ExtractionRequest
-{
-    Url = "https://news.ycombinator.com/",
-    Attributes =
-    [
-        new ExtractionAttribute
-        {
-            Name = "Title",
-            Description = "News title"
-        },
-        new ExtractionAttribute
-        {
-            Name = "Points",
-            Description = "Number of points"
-        },
-    ],
-    ProxyCountry = "UnitedStates"
-};
-
-var result = await parseraClient.ExtractAsync(extractionRequest);
+var result = await parseraClient.ExtractAsync<ExtractionModel>("https://news.ycombinator.com/", "UnitedStates");
 
 Console.WriteLine("\nExtraction result:");
 var counter = 1;
-foreach (var extraction in result.Data)
+foreach (var extraction in result)
 {
     Console.WriteLine($"Extraction {counter++}");
-    foreach (var attribute in extraction.ToList())
-    {
-        Console.WriteLine($"{attribute.Key}: {attribute.Value}");
-    }
+    Console.WriteLine($"Title: {extraction.Title}");
+    Console.WriteLine($"Points: {extraction.Points}");
     Console.WriteLine();
+}
+
+class ExtractionModel
+{
+    [Extraction("Title", "News title")]
+    public string Title { get; set; }
+
+    [Extraction("Points", "Number of points")]
+    public int Points { get; set; }
 }

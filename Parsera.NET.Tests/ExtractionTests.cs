@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Parsera.Models;
 
 namespace Parsera.Tests;
 
@@ -16,31 +15,22 @@ public class ExtractionTests
         _parseraClient = new ParseraClient(configuration["ParseraApiKey"] ?? string.Empty);
     }
 
+    class ExtractionModel
+    {
+        [Extraction("Title", "News title")]
+        public string Title { get; set; }
+
+        [Extraction("Points", "Number of points")]
+        public int Points { get; set; }
+    }
+
     [Fact]
     public async Task ExtractData()
     {
-        var extractionRequest = new ExtractionRequest
-        {
-            Url = "https://news.ycombinator.com/",
-            Attributes =
-            [
-                new ExtractionAttribute
-                {
-                    Name = "Title",
-                    Description = "News title"
-                },
-                new ExtractionAttribute
-                {
-                    Name = "Points",
-                    Description = "Number of points"
-                },
-            ],
-            ProxyCountry = "UnitedStates"
-        };
-
-        var result = await _parseraClient.ExtractAsync(extractionRequest);
+        var result = await _parseraClient.ExtractAsync<ExtractionModel>("https://news.ycombinator.com/", "UnitedStates");
 
         Assert.NotNull(result);
-        Assert.NotEmpty(result.Data);
+        Assert.NotEmpty(result);
+        Assert.True(result.All(x => !string.IsNullOrWhiteSpace(x.Title)));
     }
 }

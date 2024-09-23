@@ -11,15 +11,17 @@ namespace Parsera
     public interface IParseraClient
     {
         /// <summary>
-        /// Extracts data from a website asynchronously.
+        /// Extracts the content of a web page.
         /// </summary>
-        /// <param name="extractionRequest">Extraction request</param>
+        /// <typeparam name="TExtractionModel">Extraction model template</typeparam>
+        /// <param name="url">Url</param>
+        /// <param name="proxyCountry">Proxy country</param>
         /// <param name="cancellation">Cancellation token</param>
         /// <returns>
-        /// An <see cref="ExtractionResult"/> object.
+        /// A collection of <typeparamref name="TExtractionModel"/> objects.
         /// A task that represents the asynchronous operation.
         /// </returns>
-        Task<ExtractionResult> ExtractAsync(ExtractionRequest extractionRequest, CancellationToken cancellation = default);
+        Task<IEnumerable<TExtractionModel>> ExtractAsync<TExtractionModel>(string url, string proxyCountry, CancellationToken cancellation = default);
 
         /// <summary>
         /// Gets the available proxy countries.
