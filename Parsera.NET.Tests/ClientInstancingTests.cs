@@ -10,9 +10,9 @@ public class ClientInstancingTests
 
     public ClientInstancingTests()
     {
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
+        var builder = new ConfigurationBuilder()
+            .AddUserSecrets<ClientInstancingTests>();
+        var configuration = builder.Build();
 
         _apiKey = configuration["ParseraApiKey"] ?? string.Empty;
     }

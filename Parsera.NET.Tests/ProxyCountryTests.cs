@@ -8,9 +8,9 @@ public class ProxyCountryTests
 
     public ProxyCountryTests()
     {
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
+        var builder = new ConfigurationBuilder()
+            .AddUserSecrets<ProxyCountryTests>();
+        var configuration = builder.Build();
 
         _parseraClient = new ParseraClient(configuration["ParseraApiKey"] ?? string.Empty);
     }

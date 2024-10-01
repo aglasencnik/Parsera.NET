@@ -74,6 +74,41 @@ class ExtractionModel
 }
 ```
 
+An alternative to the above example is to extract data from a specific website yourself and use the `ParseAsync` method to parse the data:
+
+```csharp
+var parseraClient = new ParseraClient("api-key");
+
+var htmlContent = await GetHtmlContent("https://news.ycombinator.com/");
+var result = await parseraClient.ParseAsync<ExtractionModel>(htmlContent);
+
+Console.WriteLine("\nExtraction result:");
+var counter = 1;
+foreach (var extraction in result)
+{
+    Console.WriteLine($"Extraction {counter++}");
+    Console.WriteLine($"Title: {extraction.Title}");
+    Console.WriteLine($"Points: {extraction.Points}");
+    Console.WriteLine();
+}
+
+static async Task<string> GetHtmlContent(string url)
+{
+    var httpClient = new HttpClient();
+    var httpResponse = await httpClient.GetAsync(url);
+    return await httpResponse.Content.ReadAsStringAsync();
+}
+
+class ExtractionModel
+{
+    [Extraction("Title", "News title")]
+    public string Title { get; set; }
+
+    [Extraction("Points", "Number of points")]
+    public int Points { get; set; }
+}
+```
+
 ### Dependency Injection and Instancing
 
 There are different ways to create an instance of `ParseraClient` in your project, either by instantiating it directly or using dependency injection (DI) in ASP.NET Core or other DI frameworks.

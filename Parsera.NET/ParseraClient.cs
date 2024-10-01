@@ -118,10 +118,17 @@ namespace Parsera
                         continue;
 
                     var value = extractionResult.FirstOrDefault(x => x.Key == extractionAttribute.Name).Value;
-                    if (value == null)
+                    if (string.IsNullOrWhiteSpace(value))
                         continue;
 
-                    property.SetValue(extractionModel, Convert.ChangeType(value, property.PropertyType));
+                    try
+                    {
+                        property.SetValue(extractionModel, Convert.ChangeType(value, property.PropertyType));
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
                 }
 
                 extractionModels.Add(extractionModel);
@@ -149,6 +156,24 @@ namespace Parsera
 
             var result = await GetResultAsync<IEnumerable<IDictionary<string, string>>, ExtractionRequest>(
                 "/v1/extract", HttpMethod.Post, extractionRequest, cancellation);
+
+            return GetExtractionResults<TExtractionModel>(result);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TExtractionModel>> ParseAsync<TExtractionModel>(string content, CancellationToken cancellation = default)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+                return null;
+
+            var parseRequest = new ParseRequest
+            {
+                Content = content,
+                Attributes = GetExtractionAttributes<TExtractionModel>(),
+            };
+
+            var result = await GetResultAsync<IEnumerable<IDictionary<string, string>>, ParseRequest>(
+                "/v1/parse", HttpMethod.Post, parseRequest, cancellation);
 
             return GetExtractionResults<TExtractionModel>(result);
         }

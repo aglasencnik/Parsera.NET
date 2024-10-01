@@ -2,14 +2,14 @@
 
 namespace Parsera.Tests;
 
-public class ExtractionTests
+public class ParseTests
 {
     private readonly IParseraClient _parseraClient;
 
-    public ExtractionTests()
+    public ParseTests()
     {
         var builder = new ConfigurationBuilder()
-            .AddUserSecrets<ExtractionTests>();
+            .AddUserSecrets<ParseTests>();
         var configuration = builder.Build();
 
         _parseraClient = new ParseraClient(configuration["ParseraApiKey"] ?? string.Empty);
@@ -24,10 +24,19 @@ public class ExtractionTests
         public int Points { get; set; }
     }
 
-    [Fact]
-    public async Task ExtractData()
+    private async Task<string> GetHtmlContent(string url)
     {
-        var result = await _parseraClient.ExtractAsync<ExtractionModel>("https://news.ycombinator.com/", "UnitedStates");
+        var httpClient = new HttpClient();
+        var httpResponse = await httpClient.GetAsync(url);
+        return await httpResponse.Content.ReadAsStringAsync();
+    }
+
+    [Fact]
+    public async Task ParseData()
+    {
+        var htmlContent = await GetHtmlContent("https://news.ycombinator.com/");
+
+        var result = await _parseraClient.ParseAsync<ExtractionModel>(htmlContent);
 
         Assert.NotNull(result);
         Assert.NotEmpty(result);

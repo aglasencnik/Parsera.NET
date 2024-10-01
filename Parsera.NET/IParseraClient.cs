@@ -24,6 +24,18 @@ namespace Parsera
         Task<IEnumerable<TExtractionModel>> ExtractAsync<TExtractionModel>(string url, string proxyCountry, CancellationToken cancellation = default);
 
         /// <summary>
+        /// Parses the content of a web page.
+        /// </summary>
+        /// <typeparam name="TExtractionModel">Extraction model template</typeparam>
+        /// <param name="content">Web page content (raw html or some other form of web content)</param>
+        /// <param name="cancellation">Cancellation token</param>
+        /// <returns>
+        /// A collection of <typeparamref name="TExtractionModel"/> objects.
+        /// A task that represents the asynchronous operation.
+        /// </returns>
+        Task<IEnumerable<TExtractionModel>> ParseAsync<TExtractionModel>(string content, CancellationToken cancellation = default);
+
+        /// <summary>
         /// Gets the available proxy countries.
         /// </summary>
         /// <param name="cancellation">Cancellation token</param>
